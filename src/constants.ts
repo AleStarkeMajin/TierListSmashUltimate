@@ -371,7 +371,7 @@ export const SSBU_CHARACTERS: Character[] = [
   {
     id: "hero",
     name: "Hero",
-    image: "https://www.smashbros.com/assets_v2/img/fighter/hero/main.png",
+    image: "https://www.smashbros.com/assets_v2/img/fighter/dq_hero/main.png",
   },
   {
     id: "banjo_and_kazooie",
@@ -407,8 +407,7 @@ export const SSBU_CHARACTERS: Character[] = [
   {
     id: "pyra_mythra",
     name: "Pyra/Mythra",
-    image:
-      "https://www.smashbros.com/assets_v2/img/fighter/pyra_mythra/main.png",
+    image: "https://www.smashbros.com/assets_v2/img/fighter/pyra/main.png",
   },
   {
     id: "kazuya",
