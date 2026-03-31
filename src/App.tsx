@@ -28,6 +28,7 @@ export default function App() {
   }, [results]);
 
   const [isAutoMode, setIsAutoMode] = useState(false);
+  const [filterCharIds, setFilterCharIds] = useState<string[]>([]);
 
   // Generate all unique pairs from all characters
   const allPairs = useMemo(() => {
@@ -39,6 +40,19 @@ export default function App() {
     }
     return p;
   }, [selectedIds]);
+
+  const filteredPairs = useMemo(() => {
+    if (filterCharIds.length === 0) return allPairs;
+    if (filterCharIds.length === 1) {
+      const target = filterCharIds[0];
+      return allPairs.filter((p) => p[0] === target || p[1] === target);
+    }
+    return allPairs.filter(
+      (p) =>
+        (p[0] === filterCharIds[0] && p[1] === filterCharIds[1]) ||
+        (p[0] === filterCharIds[1] && p[1] === filterCharIds[0]),
+    );
+  }, [allPairs, filterCharIds]);
 
   const handlePairSelect = useCallback(
     (pair: [string, string], auto: boolean = false) => {
@@ -77,17 +91,19 @@ export default function App() {
       });
 
       if (isAutoMode) {
-        // Find the next incomplete pair (only skip if we're in auto mode and it's already done)
-        // Actually, in auto mode we might want to skip completed ones OR just keep going.
-        // Let's stick to skipping completed ones in auto-mode for efficiency.
-        const nextPair = allPairs.find(
-          (p) =>
-            !results.some(
-              (r) =>
-                (r.charAId === p[0] && r.charBId === p[1]) ||
-                (r.charAId === p[1] && r.charBId === p[0]),
-            ),
-        );
+        // Find the next incomplete pair in the filtered list
+        const nextPair = filteredPairs.find((p) => {
+          const isCurrent =
+            (p[0] === activePair[0] && p[1] === activePair[1]) ||
+            (p[0] === activePair[1] && p[1] === activePair[0]);
+          if (isCurrent) return false;
+
+          return !results.some(
+            (r) =>
+              (r.charAId === p[0] && r.charBId === p[1]) ||
+              (r.charAId === p[1] && r.charBId === p[0]),
+          );
+        });
 
         if (nextPair) {
           setActivePair(nextPair);
@@ -102,16 +118,14 @@ export default function App() {
         setState(AppState.PAIR_SELECTION);
       }
     },
-    [activePair, isAutoMode, allPairs, results],
+    [activePair, isAutoMode, filteredPairs, results],
   );
 
   // const reset = useCallback(() => {
-  //   if (
-  //     window.confirm("¿Estás seguro de que quieres reiniciar todo el progreso?")
-  //   ) {
+  //   if (window.confirm('¿Estás seguro de que quieres reiniciar todo el progreso?')) {
   //     setState(AppState.PAIR_SELECTION);
   //     setResults([]);
-  //     localStorage.removeItem("ssbu-tier-results");
+  //     localStorage.removeItem('ssbu-tier-results');
   //     setActivePair(null);
   //     setShowInterim(false);
   //     setIsAutoMode(false);
@@ -177,7 +191,7 @@ export default function App() {
             </button>
           )}
           {/* {results.length > 0 && (
-            <button
+            <button 
               onClick={reset}
               className="px-4 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-500 text-xs font-bold rounded-lg transition-all border border-red-500/30"
             >
@@ -193,9 +207,11 @@ export default function App() {
             pairs={allPairs}
             results={results}
             characters={SSBU_CHARACTERS}
+            filterCharIds={filterCharIds}
+            onFilterChange={setFilterCharIds}
             onSelectPair={(p) => handlePairSelect(p, false)}
             onStartAuto={() => {
-              const firstIncomplete = allPairs.find(
+              const firstIncomplete = filteredPairs.find(
                 (p) =>
                   !results.some(
                     (r) =>
@@ -204,7 +220,8 @@ export default function App() {
                   ),
               );
               if (firstIncomplete) handlePairSelect(firstIncomplete, true);
-              else handlePairSelect(allPairs[0], true); // Fallback to first if all done
+              else if (filteredPairs.length > 0)
+                handlePairSelect(filteredPairs[0], true); // Fallback to first if all done
             }}
             onFinalize={() => setState(AppState.RESULTS)}
             isFullyComplete={isFullyComplete}

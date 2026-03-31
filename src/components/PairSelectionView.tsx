@@ -5,6 +5,8 @@ interface PairSelectionViewProps {
   pairs: [string, string][];
   results: ComparisonResult[];
   characters: Character[];
+  filterCharIds: string[];
+  onFilterChange: (ids: string[]) => void;
   onSelectPair: (pair: [string, string]) => void;
   onStartAuto: () => void;
   onFinalize: () => void;
@@ -15,12 +17,13 @@ const PairSelectionView: React.FC<PairSelectionViewProps> = ({
   pairs,
   results,
   characters,
+  filterCharIds,
+  onFilterChange,
   onSelectPair,
   onStartAuto,
   // onFinalize,
   isFullyComplete,
 }) => {
-  const [filterCharIds, setFilterCharIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const isPairCompleted = (charAId: string, charBId: string) => {
@@ -32,11 +35,12 @@ const PairSelectionView: React.FC<PairSelectionViewProps> = ({
   };
 
   const toggleFilter = (id: string) => {
-    setFilterCharIds((prev) => {
-      if (prev.includes(id)) return prev.filter((i) => i !== id);
-      if (prev.length >= 2) return [prev[1], id];
-      return [...prev, id];
-    });
+    const next = filterCharIds.includes(id)
+      ? filterCharIds.filter((i) => i !== id)
+      : filterCharIds.length >= 2
+        ? [filterCharIds[1], id]
+        : [...filterCharIds, id];
+    onFilterChange(next);
   };
 
   const filteredPairs = useMemo(() => {
@@ -122,7 +126,7 @@ const PairSelectionView: React.FC<PairSelectionViewProps> = ({
           <div className="flex items-center gap-2">
             {filterCharIds.length > 0 && (
               <button
-                onClick={() => setFilterCharIds([])}
+                onClick={() => onFilterChange([])}
                 className="text-[10px] font-black uppercase text-red-500 hover:text-red-400 transition-colors px-3 py-1 bg-red-500/10 rounded-lg border border-red-500/20"
               >
                 Limpiar Filtro
@@ -260,7 +264,7 @@ const PairSelectionView: React.FC<PairSelectionViewProps> = ({
               No se encontraron matchups con esos criterios
             </p>
             <button
-              onClick={() => setFilterCharIds([])}
+              onClick={() => onFilterChange([])}
               className="text-blue-500 text-xs font-black underline hover:text-blue-400"
             >
               Limpiar todos los filtros
