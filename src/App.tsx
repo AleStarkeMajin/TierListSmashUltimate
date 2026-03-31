@@ -105,18 +105,18 @@ export default function App() {
     [activePair, isAutoMode, allPairs, results],
   );
 
-  const reset = useCallback(() => {
-    if (
-      window.confirm("¿Estás seguro de que quieres reiniciar todo el progreso?")
-    ) {
-      setState(AppState.PAIR_SELECTION);
-      setResults([]);
-      localStorage.removeItem("ssbu-tier-results");
-      setActivePair(null);
-      setShowInterim(false);
-      setIsAutoMode(false);
-    }
-  }, []);
+  // const reset = useCallback(() => {
+  //   if (
+  //     window.confirm("¿Estás seguro de que quieres reiniciar todo el progreso?")
+  //   ) {
+  //     setState(AppState.PAIR_SELECTION);
+  //     setResults([]);
+  //     localStorage.removeItem("ssbu-tier-results");
+  //     setActivePair(null);
+  //     setShowInterim(false);
+  //     setIsAutoMode(false);
+  //   }
+  // }, []);
 
   const scoreBoard = useMemo(() => {
     const scores: ScoreBoard = {};

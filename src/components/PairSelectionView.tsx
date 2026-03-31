@@ -17,7 +17,7 @@ const PairSelectionView: React.FC<PairSelectionViewProps> = ({
   characters,
   onSelectPair,
   onStartAuto,
-  onFinalize,
+  // onFinalize,
   isFullyComplete,
 }) => {
   const [filterCharIds, setFilterCharIds] = useState<string[]>([]);
