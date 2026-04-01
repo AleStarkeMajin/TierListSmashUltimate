@@ -5,6 +5,10 @@ import firebaseConfig from "./firebase-applet-config.json";
 
 // Initialize Firebase SDK
 const app = initializeApp(firebaseConfig);
+console.log(
+  "Firebase initialized with projectId:",
+  firebaseConfig.projectId ?? "<missing>",
+);
 // Use the modular API's getFirestore with the initialized app.
 // Passing a second argument (like firestoreDatabaseId) is not part of the standard
 // SDK signature; use `getFirestore(app)` and reference any custom database id
@@ -29,7 +33,11 @@ async function testConnection() {
     // Other errors (like permission denied) are expected since we haven't set up rules yet
   }
 }
-
+signInAnonymously(auth)
+  .then((cred) => {
+    console.log("Signed in anonymously", cred.user?.uid);
+  })
+  .catch((err) => console.error("Error signing in anonymously:", err));
 testConnection();
 
 // Sign in anonymously to allow database access if rules require authentication

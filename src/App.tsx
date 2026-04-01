@@ -140,11 +140,14 @@ export default function App() {
       const path = `comparisons/${docId}`;
 
       try {
+        console.log("Saving comparison to Firestore", docId, newResult);
         await setDoc(doc(db, "comparisons", docId), {
           ...newResult,
           updatedAt: serverTimestamp(),
         });
+        console.log("Saved comparison to Firestore", docId);
       } catch (error) {
+        console.error("Error during setDoc:", error);
         handleFirestoreError(error, "write", path);
       }
 
