@@ -229,20 +229,28 @@ export default function App() {
         </div>
         <div className="flex gap-2">
           {(state === AppState.PAIR_SELECTION ||
+            state === AppState.RESULTS ||
             (state === AppState.COMPARISON && !isAutoMode)) && (
             <button
               onClick={() => {
-                if (state === AppState.COMPARISON)
+                if (state === AppState.RESULTS) {
                   setState(AppState.PAIR_SELECTION);
-                setShowInterim(!showInterim);
+                  setShowInterim(false);
+                } else {
+                  if (state === AppState.COMPARISON)
+                    setState(AppState.PAIR_SELECTION);
+                  setShowInterim(!showInterim);
+                }
               }}
               className={`px-4 py-2 text-xs font-bold rounded-lg transition-all border ${
-                showInterim
+                showInterim || state === AppState.RESULTS
                   ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]"
                   : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
               }`}
             >
-              {showInterim ? "Cerrar Ranking" : "Ranking Temporal"}
+              {showInterim || state === AppState.RESULTS
+                ? "Cerrar Ranking"
+                : "Ranking Temporal"}
             </button>
           )}
           {/* {results.length > 0 && (
@@ -302,16 +310,22 @@ export default function App() {
 
         {(state === AppState.RESULTS || showInterim) && (
           <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-            {showInterim && (
+            {(showInterim || state === AppState.RESULTS) && (
               <div className="bg-slate-900 border border-blue-500/30 p-4 rounded-xl text-center mb-6 shadow-xl shadow-blue-500/5">
                 <p className="text-blue-400 font-bold text-sm">
-                  VISTA PREVIA DE RANKING ({results.length}/{allPairs.length})
+                  {state === AppState.RESULTS
+                    ? "RANKING ACTUAL"
+                    : `RANKING ACTUAL (${results.length}/${allPairs.length})`}
                 </p>
                 <button
-                  onClick={() => setShowInterim(false)}
+                  onClick={() => {
+                    setShowInterim(false);
+                    if (state === AppState.RESULTS)
+                      setState(AppState.PAIR_SELECTION);
+                  }}
                   className="mt-2 text-xs text-slate-400 hover:text-white transition-colors"
                 >
-                  Regresar al análisis anterior
+                  Regresar a la selección de personajes
                 </button>
               </div>
             )}

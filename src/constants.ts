@@ -101,6 +101,21 @@ export const SSBU_CHARACTERS: Character[] = [
     image: "https://www.smashbros.com/assets_v2/img/fighter/zelda/main.png",
   },
   {
+    id: "doctor_mario",
+    name: "Dr. Mario",
+    image: "https://www.smashbros.com/assets_v2/img/fighter/dr_mario/main.png",
+  },
+  {
+    id: "pichu",
+    name: "Pichu",
+    image: "https://www.smashbros.com/assets_v2/img/fighter/pichu/main.png",
+  },
+  {
+    id: "falco",
+    name: "Falco",
+    image: "https://www.smashbros.com/assets_v2/img/fighter/falco/main.png",
+  },
+  {
     id: "marth",
     name: "Marth",
     image: "https://www.smashbros.com/assets_v2/img/fighter/marth/main.png",
@@ -330,11 +345,11 @@ export const SSBU_CHARACTERS: Character[] = [
     name: "Ridley",
     image: "https://www.smashbros.com/assets_v2/img/fighter/ridley/main.png",
   },
-  {
-    id: "simon",
-    name: "Simon",
-    image: "https://www.smashbros.com/assets_v2/img/fighter/simon/main.png",
-  },
+  // {
+  //   id: "simon",
+  //   name: "Simon",
+  //   image: "https://www.smashbros.com/assets_v2/img/fighter/simon/main.png",
+  // },
   {
     id: "richter",
     name: "Richter",
@@ -418,5 +433,23 @@ export const SSBU_CHARACTERS: Character[] = [
     id: "sora",
     name: "Sora",
     image: "https://www.smashbros.com/assets_v2/img/fighter/sora/main.png",
+  },
+  {
+    id: "mii_brawler",
+    name: "Mii Brawler",
+    image:
+      "https://static.wikitide.net/dragdownwiki/4/46/SSBU_Mii_Brawler_Portrait.png",
+  },
+  {
+    id: "mii_swordfighter",
+    name: "Mii Swordfighter",
+    image:
+      "https://static.wikia.nocookie.net/ssb/images/2/25/Mii_Swordfighter_-_Super_Smash_Bros._Ultimate.png/revision/latest/scale-to-width-down/1200?cb=20180705145938",
+  },
+  {
+    id: "mii_gunner",
+    name: "Mii Gunner",
+    image:
+      "https://cdn.wikimg.net/en/zeldawiki/images/9/92/SSBU_Mii_Gunner_Render.png",
   },
 ];
