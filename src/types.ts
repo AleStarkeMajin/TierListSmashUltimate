@@ -15,6 +15,7 @@ export interface ComparisonResult {
   charAId: string;
   charBId: string;
   answers: Record<string, Winner>;
+  updatedAt?: any;
 }
 
 export interface ScoreBoard {

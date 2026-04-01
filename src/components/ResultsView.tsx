@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import type { ScoreBoard, Character } from "../types";
+import type { ScoreBoard, Character } from "../types.ts";
 
 interface ResultsViewProps {
   scores: ScoreBoard;

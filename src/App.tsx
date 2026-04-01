@@ -1,31 +1,91 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { SSBU_CHARACTERS, QUESTIONS } from "./constants";
-import { AppState } from "./types";
-import type { ComparisonResult, Winner, ScoreBoard } from "./types";
-import ComparisonView from "./components/ComparisonView";
-import ResultsView from "./components/ResultsView";
-import PairSelectionView from "./components/PairSelectionView";
+import { SSBU_CHARACTERS, QUESTIONS } from "./constants.ts";
+import { AppState } from "./types.ts";
+import type { ComparisonResult, Winner, ScoreBoard } from "./types.ts";
+import ComparisonView from "./components/ComparisonView.tsx";
+import ResultsView from "./components/ResultsView.tsx";
+import PairSelectionView from "./components/PairSelectionView.tsx";
+import { db, auth } from "./firebase.ts";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+
+type OperationType = "create" | "update" | "delete" | "list" | "get" | "write";
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId: string | undefined;
+    email: string | null | undefined;
+    emailVerified: boolean | undefined;
+    isAnonymous: boolean | undefined;
+  };
+}
+
+function handleFirestoreError(
+  error: unknown,
+  operationType: OperationType,
+  path: string | null,
+) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+    },
+    operationType,
+    path,
+  };
+  const errorString = JSON.stringify(errInfo);
+  console.error("Firestore Error: ", errorString);
+  throw new Error(errorString);
+}
 
 export default function App() {
   // Start directly at PAIR_SELECTION with all characters selected by default
   const [state, setState] = useState<AppState>(AppState.PAIR_SELECTION);
   const selectedIds = useMemo(() => SSBU_CHARACTERS.map((c) => c.id), []);
   const [activePair, setActivePair] = useState<[string, string] | null>(null);
-  const [results, setResults] = useState<ComparisonResult[]>(() => {
-    const saved = localStorage.getItem("ssbu-tier-results");
-    try {
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error("Error parsing saved results", e);
-      return [];
-    }
-  });
+  const [results, setResults] = useState<ComparisonResult[]>([]);
+  const [isAuthReady, setIsAuthReady] = useState(false);
   const [showInterim, setShowInterim] = useState(false);
 
-  // Save results to localStorage whenever they change
+  // Auth state listener
   useEffect(() => {
-    localStorage.setItem("ssbu-tier-results", JSON.stringify(results));
-  }, [results]);
+    return auth.onAuthStateChanged((user: any) => {
+      setIsAuthReady(!!user);
+    });
+  }, []);
+
+  // Sync results from Firestore
+  useEffect(() => {
+    if (!isAuthReady) return;
+
+    const path = "comparisons";
+    const unsubscribe = onSnapshot(
+      collection(db, path),
+      (snapshot: any) => {
+        const newResults: ComparisonResult[] = [];
+        snapshot.forEach((docRef: any) => {
+          newResults.push(docRef.data() as ComparisonResult);
+        });
+        setResults(newResults);
+      },
+      (error: any) => {
+        handleFirestoreError(error, "list", path);
+      },
+    );
+
+    return () => unsubscribe();
+  }, [isAuthReady]);
 
   const [isAutoMode, setIsAutoMode] = useState(false);
   const [filterCharIds, setFilterCharIds] = useState<string[]>([]);
@@ -65,8 +125,8 @@ export default function App() {
   );
 
   const handleComparisonComplete = useCallback(
-    (answers: Record<string, Winner>) => {
-      if (!activePair) return;
+    async (answers: Record<string, Winner>) => {
+      if (!activePair || !isAuthReady) return;
 
       const newResult: ComparisonResult = {
         charAId: activePair[0],
@@ -74,21 +134,19 @@ export default function App() {
         answers,
       };
 
-      setResults((prev) => {
-        // Find index of existing result for this pair (order independent)
-        const existingIndex = prev.findIndex(
-          (r) =>
-            (r.charAId === activePair[0] && r.charBId === activePair[1]) ||
-            (r.charAId === activePair[1] && r.charBId === activePair[0]),
-        );
+      // Use a consistent ID for the pair (alphabetical order)
+      const sortedIds = [...activePair].sort();
+      const docId = `${sortedIds[0]}_${sortedIds[1]}`;
+      const path = `comparisons/${docId}`;
 
-        if (existingIndex !== -1) {
-          const updated = [...prev];
-          updated[existingIndex] = newResult;
-          return updated;
-        }
-        return [...prev, newResult];
-      });
+      try {
+        await setDoc(doc(db, "comparisons", docId), {
+          ...newResult,
+          updatedAt: serverTimestamp(),
+        });
+      } catch (error) {
+        handleFirestoreError(error, "write", path);
+      }
 
       if (isAutoMode) {
         // Find the next incomplete pair in the filtered list
@@ -122,14 +180,8 @@ export default function App() {
   );
 
   // const reset = useCallback(() => {
-  //   if (window.confirm('¿Estás seguro de que quieres reiniciar todo el progreso?')) {
-  //     setState(AppState.PAIR_SELECTION);
-  //     setResults([]);
-  //     localStorage.removeItem('ssbu-tier-results');
-  //     setActivePair(null);
-  //     setShowInterim(false);
-  //     setIsAutoMode(false);
-  //   }
+  //   // Shared reset is disabled for now to prevent accidental data loss for all users
+  //   alert('El reinicio global está deshabilitado para proteger los datos compartidos.');
   // }, []);
 
   const scoreBoard = useMemo(() => {

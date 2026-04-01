@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import type { Character, ComparisonResult } from "../types";
+import type { Character, ComparisonResult } from "../types.ts";
 
 interface PairSelectionViewProps {
   pairs: [string, string][];

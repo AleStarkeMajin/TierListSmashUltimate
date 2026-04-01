@@ -1,0 +1,35 @@
+{
+  "entities": {
+    "ComparisonResult": {
+      "title": "ComparisonResult",
+      "description": "A result of a comparison between two characters",
+      "type": "object",
+      "properties": {
+        "charAId": {
+          "type": "string",
+          "description": "The ID of the first character"
+        },
+        "charBId": {
+          "type": "string",
+          "description": "The ID of the second character"
+        },
+        "answers": {
+          "type": "object",
+          "description": "A map of question IDs to winner ('A', 'B', or 'Neutral')"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when this comparison was last updated"
+        }
+      },
+      "required": ["charAId", "charBId", "answers"]
+    }
+  },
+  "firestore": {
+    "/comparisons/{comparisonId}": {
+      "schema": "ComparisonResult",
+      "description": "Collection of character comparisons"
+    }
+  }
+}

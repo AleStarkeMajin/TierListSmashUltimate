@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: comparisons
+    // Document ID: charAId_charBId (alphabetical order)
+    // Fields:
+    //   - charAId: string (required) - ID of the first character
+    //   - charBId: string (required) - ID of the second character
+    //   - answers: map (required) - Map of question IDs to winner ('A', 'B', or 'Neutral')
+    //   - updatedAt: timestamp (optional) - When the comparison was last updated
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidComparison(data) {
+      return data.keys().hasAll(['charAId', 'charBId', 'answers']) &&
+             data.charAId is string && data.charAId.size() > 0 && data.charAId.size() < 50 &&
+             data.charBId is string && data.charBId.size() > 0 && data.charBId.size() < 50 &&
+             data.answers is map &&
+             data.keys().hasOnly(['charAId', 'charBId', 'answers', 'updatedAt']);
+    }
+
+    match /comparisons/{comparisonId} {
+      // Allow anyone authenticated to read and write comparisons
+      // This is a shared database for all users
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isValidComparison(request.resource.data);
+      allow delete: if false; // Progress should not be deleted by users
+    }
+
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

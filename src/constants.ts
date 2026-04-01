@@ -1,4 +1,4 @@
-import type { Character, Question } from "./types";
+import type { Character, Question } from "./types.ts";
 
 export const QUESTIONS: Question[] = [
   { id: "neutral", text: "¿Quién tiene mejor neutral?" },

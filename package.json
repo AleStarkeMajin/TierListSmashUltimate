@@ -10,8 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@firebase/app": "^0.14.10",
+    "@firebase/auth": "^1.12.2",
+    "@firebase/component": "^0.7.2",
+    "@firebase/firestore": "^4.13.0",
+    "@firebase/util": "^1.15.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
+  },
+  "optionalDependencies": {
+    "firebase": "^10.14.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
