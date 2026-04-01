@@ -95,19 +95,29 @@ const PairSelectionView: React.FC<PairSelectionViewProps> = ({
           </div>
 
           {!isFullyComplete && (
-            <button
-              onClick={onStartAuto}
-              className="mt-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-black text-white text-xs shadow-lg shadow-blue-900/20 scale-100 hover:scale-105 active:scale-95 transition-all uppercase tracking-tight flex items-center gap-3"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Seguir secuencia automática
-            </button>
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[10px] text-slate-500 font-black uppercase tracking-wider max-w-xs mx-auto leading-relaxed">
+                Puedes seleccionar tu personaje abajo en el filtro y seguir la
+                secuencia solo de tu personaje
+              </p>
+              <button
+                onClick={onStartAuto}
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-black text-white text-xs shadow-lg shadow-blue-900/20 scale-100 hover:scale-105 active:scale-95 transition-all uppercase tracking-tight flex items-center gap-3"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Seguir secuencia automática
+              </button>
+            </div>
           )}
         </div>
       </div>
